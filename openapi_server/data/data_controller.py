@@ -18,6 +18,29 @@ def recursive_partial_match(args:dict, element:dict, level="root"):
         return args == element
 
 
+def match_field_dict(field_elements:list, origin:dict, dest:dict):
+    """
+    Match possible nested field elements in a origin dictionary and return
+    the matching elements and merge in destination.
+    """
+    first, *rest = field_elements
+    if first in origin:
+        if len(rest) > 0:
+            result = { first: match_field_dict(rest, origin[first], dest.get(first) or {}) }
+        else:
+            result = { first:  origin[first]}
+        dest = dest | result
+        return dest
+
+
+def filter_fields(fields: list, origin:dict):
+    dest = {}
+    for field in fields:
+        field_elements = field.split(".")
+        dest = match_field_dict(field_elements, origin, dest)
+    return dest
+
+
 class DataController:
     """
     Handle read data operations

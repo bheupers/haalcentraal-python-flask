@@ -13,7 +13,7 @@ from openapi_server.models.personen_query import PersonenQuery  # noqa: E501
 from openapi_server.models.personen_query_response import PersonenQueryResponse  # noqa: E501
 from openapi_server import util
 
-from openapi_server.data.data_controller import DataController
+from openapi_server.data.data_controller import DataController, filter_fields
 from openapi_server.models.persoon import Persoon
 from openapi_server.models.raadpleeg_met_burgerservicenummer import RaadpleegMetBurgerservicenummer
 from openapi_server.models.raadpleeg_met_burgerservicenummer_response import RaadpleegMetBurgerservicenummerResponse
@@ -74,7 +74,7 @@ def personen(body=None):  # noqa: E501
                     return response
                 fields = request_json.pop("fields")
                 results = all_data.search({"burgerservicenummer": query.burgerservicenummer[0]})
-                results = [{f: result[f] for f in fields} for result in results]
+                results = [filter_fields(fields, result) for result in results]
                 personen = [Persoon.from_dict(result) for result in results]
                 response = RaadpleegMetBurgerservicenummerResponse(type, personen)
                 return response
